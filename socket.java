@@ -1,14 +1,15 @@
-package com.company.oop;
 
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.SocketHandler;
 
 public class socket {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 
         Socket socket = new Socket("localhost",6666);
@@ -21,30 +22,30 @@ public class socket {
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
 
-        HashMap<String,String> name = new HashMap<>();
-        name.put("prutvhi","jadeja");
-        name.put("vedant","dokania");
+
+        HashMap<String,String> hashMap = new HashMap<>();
+        hashMap.put("pruthvi","JAdeja");
+        hashMap.put("jsj","jdsj");
+
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(byteOut);
+        out.writeObject(hashMap);
+        out.flush();
+        out.close();
 
 
-        while (true) {
-            String output = bufferedReader.readLine();
-            System.out.println("server = " + output);
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        dataOutputStream.write(byteOut.toByteArray());
+        dataOutputStream.flush();
+        dataOutputStream.close();
 
-            Scanner scanner = new Scanner(System.in);
 
-            if(output.equalsIgnoreCase("Bye")){
-                bufferedWriter.write(scanner.nextLine());
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
-                socket.close();
-                break;
-            }
+        InputStream inputStream = new DataInputStream(socket.getInputStream());
 
-            bufferedWriter.write(String.valueOf(name));
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
+        ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(inputStream.readAllBytes()));
+
+        Map<Integer, String> data2 = (Map<Integer, String>) objectInputStream.readObject();
+        System.out.println("data = " + data2.toString());
 
         }
-
-    }
 }
